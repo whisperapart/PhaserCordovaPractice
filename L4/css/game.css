@@ -1,0 +1,55 @@
+#gameDiv{
+    width:100vw; height: 100vh;
+    padding: 0; margin:0;
+    position: absolute;
+    left: 0; top: 0;
+    /*background-color: #4B946A;*/
+    overflow: hidden;
+}
+
+#guiDiv{
+    background-color: transparent;
+    position: fixed;
+    left:0;top:0;
+    width: 100vw; height: 100vh;
+}
+#mainMenu{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: #cccccc;
+}
+#mm_logo{
+    width: 60vw; height: 100vh;
+    margin:0;padding: 0;
+    font-size: 96px;font-weight: 800;
+    text-align: center;vertical-align: middle;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+#mm_controls{
+    width: 36vw;height: 100vh;
+    margin: 0;padding:0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+#inGameMenu nav.bg-body-tertiary{
+    background-color: transparent !important;
+}
+#inGameMenu nav.bg-body-tertiary a{
+    color:white;
+}
+#modalTank .modal-dialog{
+    width: 60vw;
+    max-width: 60vw;
+}
+#modalTank .modal-body{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+#modalTank .modal-body .card .list-group{
+    width: 40vw;
+}

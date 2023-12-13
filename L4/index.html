@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        <meta name="color-scheme" content="light dark">
+        <link rel="stylesheet" href="./css/index.css">
+        <link rel="stylesheet" href="./css/bootstrap.sketchy.min.css">
+        <link rel="stylesheet" href="./css/animateCss.css">
+        <link rel="stylesheet" href="./css/game.css">
+        <title>PhaCdv Tank</title>
+    </head>
+    <body>
+        <div id="gameDiv"></div>
+        <div id="guiDiv">
+            <div id="mainMenu">
+                <div id="mm_logo">
+                    PhaCdv Tank
+                </div>
+                <div id="mm_controls">
+                    <div class="btn-group-vertical">
+                        <button class="btn btn-lg btn-success" type="button" id="mm_btn_start">Start Game</button>
+                        <button class="btn btn-lg btn-outline-secondary" type="button">Game Settings</button>
+                        <button class="btn btn-lg btn-link" type="button">Credits</button>
+                        <button class="btn btn-lg btn-outline-danger" type="button">Exit Game</button>
+                    </div>
+                </div>
+            </div>
+            <div id="inGameMenu">
+                <nav class="navbar navbar-expand-lg bg-body-tertiary">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="#">Level: 12</a>
+                        <div class="collapse navbar-collapse" id="navbarColor04">
+                            <ul class="navbar-nav me-auto">
+
+                            </ul>
+                            <div class="d-flex">
+                                <button class="btn btn-secondary my-2 my-sm-0" id="igm_btn_tank">坦克</button>
+                                <button class="btn btn-secondary my-2 my-sm-0">道具</button>
+                                <button class="btn btn-secondary my-2 my-sm-0">主菜单</button>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
+            </div>
+        </div>
+
+        <!-- tank modal starts-->
+        <div class="modal" id="modalTank">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tanks</h5>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">delta</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">Tank-1</li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">Tank-2</li>
+                        </ul>
+                        <div class="card border-primary mb-3">
+                            <div class="card-header">Tank-1</div>
+                            <div class="card-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">装甲
+                                        <span class="badge bg-primary rounded-pill">20</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">移动
+                                        <span class="badge bg-primary rounded-pill">100</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">伤害
+                                        <span class="badge bg-primary rounded-pill">45</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">命中
+                                        <span class="badge bg-primary rounded-pill">80%</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">射速
+                                        <span class="badge bg-primary rounded-pill">30</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="mt_btn_close">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end of tank modal -->
+    </body>
+    <script type="text/javascript" src="./cordova.js"></script>
+    <script type="text/javascript" src="./js/jquery.3.4.0.min.js"></script>
+    <script type="text/javascript" src="./js/bootstrap.5.3.2.min.js"></script>
+    <script type="text/javascript" src="./js/index.js"></script>
+    <script type="text/javascript" src="./js/phaser.min.miku.js"></script>
+<script type="text/javascript">
+    class Example extends Phaser.Scene {
+        ball;
+        tiles;
+        map;
+        layerMap = new Map();
+
+        preload () {
+            this._loadSpriteImage();
+            this._loadTileSetImage();
+            this._loadTileMap();
+        }
+
+        create () {
+            this._createBall();
+            this._createMap();
+            this.physics.world.setBounds(0,0,this.map.widthInPixels,this.map.heightInPixels);
+            this._createCameras();
+        }
+
+        update () {
+        }
+
+        _loadSpriteImage(){
+            this.load.image('ball','./assets/sprites/ball.png');
+        }
+        _loadTileSetImage(){
+            this.load.image('tank_tile_set_image','./assets/map/tank_ts-extrud.png');
+        }
+        _loadTileMap(){
+            this.load.tilemapTiledJSON('tank','./assets/map/tank-map.json');
+        }
+        _createMap(){
+            this.map = this.make.tilemap({key:'tank'});
+            this.tiles = this.map.addTilesetImage("tank_ts","tank_tile_set_image",32,32,2,4);
+            this.layerMap.set('layer-land',this.map.createLayer('land',this.tiles,0,0));
+            this.layerMap.set('layer-decoration',this.map.createLayer('decoration',this.tiles,0,0));
+            this.layerMap.set('layer-screen',this.map.createLayer('screen',this.tiles,0,0));
+        }
+        _createBall(){
+            this.ball = this.physics.add.sprite(50,300,'ball');
+            this.ball.setCircle(96);
+            this.ball.setScale(0.5);
+            this.ball.body.setBounce(1,1);
+            this.ball.body.setCollideWorldBounds(true);
+            this.ball.setGravity(100);
+            this.ball.setVelocityX(100);
+            this.ball.setAngularVelocity(100);
+            this.ball.setDepth(5);
+        }
+        _createCameras(){
+            this.cameras.main.setBounds(0,0,this.map.widthInPixels,this.map.heightInPixels);
+            this.cameras.main.startFollow(this.ball);
+        }
+    }
+
+    const config = {
+        type: Phaser.WEBGL,
+        parent: 'gameDiv',
+        width: document.body.clientWidth,
+        height: document.body.clientHeight,
+        physics:{
+            default:'arcade',
+            arcade:{debug:true}
+        },
+        scene: Example
+    };
+
+    // manager class
+    class GuiManager{
+        eleId;
+        static strMainMenu = "mainMenu";
+        static strInGameMenu = "inGameMenu";
+        static strModalTank = "modalTank";
+        mapComponents = new Map();      // 管理的所有GUI components
+        constructor(strId) {
+            this.instance = null;
+            this.eleId = "#"+strId;
+            this._initMainMenu(GuiManager.strMainMenu);
+            this._initInGameMenu(GuiManager.strInGameMenu);
+        }
+
+        static getInstance(strId){
+            if(this.instance) return this.instance;
+            return this.instance = new GuiManager(strId);
+        }
+
+        _initMainMenu(strId){
+            console.log("init main menu = "+strId);
+            let mainMenu = MenuMain.getInstance(strId);
+            mainMenu.show();
+            this.mapComponents.set(strId,mainMenu);
+        }
+        _initInGameMenu(strId){
+            console.log("init in game menu");
+            let inGameMenu = MenuInGame.getInstance(strId);
+            inGameMenu.hide();
+            this.mapComponents.set(strId,inGameMenu);
+
+            this._initModalTank(GuiManager.strModalTank);
+        }
+        _initModalTank(strId){
+            console.log("init modal tank");
+            let modalTank = ModalTank.getInstance(strId);
+            modalTank.hide();
+            this.mapComponents.set(strId,modalTank);
+        }
+
+        mainMenu(strCmd){
+            this._dispatcher(GuiManager.strMainMenu,strCmd);
+        }
+        inGameMenu(strCmd){
+            this._dispatcher(GuiManager.strInGameMenu,strCmd);
+        }
+        tankModal(strCmd){
+            if(strCmd === 'show'){
+                this._dispatcher(GuiManager.strInGameMenu,strCmd);
+            }
+            this._dispatcher(GuiManager.strModalTank,strCmd);
+        }
+
+        _dispatcher(strId,strCmd){
+            let uiComp = this.mapComponents.get(strId);
+            if(!uiComp) return;
+            switch (strCmd){
+                case 'hide':
+                    uiComp.hide();
+                    break;
+                case 'show':
+                    uiComp.show();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+
+    // base class
+    class GUIComponent{
+        eleId;
+
+        constructor(strId) {
+            this.instance = null;
+            this.eleId = "#"+strId;
+        }
+        // 虚方法
+        static getInstance(strId){
+        }
+        // 是否显示了
+        isShow(){
+            return ($(this.eleId).css("display") === "block");
+        }
+
+        // 显示 - 可以自定义，或者直接使用bootstrap 或者其他 animate css 效果
+        show(){
+            if(!this.isShow()) $(this.eleId).show();
+        }
+        // 隐藏
+        hide(){
+            $(this.eleId).hide();
+        }
+        // 更多其他效果，例如晃动窗口等
+        ani_shake(){
+            // etc ...
+        }
+
+    }
+
+
+    // 基本方法 构建单例 与 dom+css 关联(View)，进行数据(model . data )和控制(control)处理
+    class MenuMain extends GUIComponent{
+        eleBtnStart = "#mm_btn_start";
+
+        constructor(strId) {
+            super(strId);
+            this._bindEvents();
+        }
+        static getInstance(strId){
+            if(this.instance) return this.instance;
+            return this.instance = new MenuMain(strId);
+        }
+
+        _bindEvents(){
+            this._bindEventBtnStart();
+        }
+        _bindEventBtnStart(){
+            $(this.eleBtnStart).on("click",function(){
+                gApp.startGame();
+            });
+        }
+        // hide(){
+        //     console.log("main menu - on hide event : "+this.eleId);
+        //     $(this.eleId).hide();
+        // }
+    }
+    // 游戏内菜单逻辑
+    class MenuInGame extends GUIComponent{
+        eleBtnTank = "#igm_btn_tank";
+        constructor(strId) {
+            super(strId);
+            this._bindEvents();
+        }
+        static getInstance(strId){
+            if(this.instance) return this.instance;
+            return this.instance = new MenuInGame(strId);
+        }
+        _bindEvents(){
+            this._bindTankBtn();
+        }
+        _bindTankBtn(){
+            $(this.eleBtnTank).on("click",function(){
+                let gm = GuiManager.getInstance();
+                gm.tankModal('show');
+            });
+        }
+    }
+    class ModalTank extends GUIComponent{
+        eleBtnClose = "#mt_btn_close";
+        btModal;
+        constructor(strId) {
+            super(strId);
+            this._bindEvents();
+        }
+        static getInstance(strId){
+            if(this.instance) return this.instance;
+            return this.instance = new ModalTank(strId);
+        }
+        _bindEvents(){
+            this._bindBtnClose();
+        }
+        _bindBtnClose(){
+            let that = this;
+            $(this.eleBtnClose).bind("click",function(){
+                that.hide();
+            });
+        }
+        show(){
+            let strId = this.eleId.substr(1);
+            this.btModal = new bootstrap.Modal(document.getElementById(strId));
+            this.btModal.show();
+        }
+        hide(){
+            // let strId = this.eleId.substr(1);
+            // var myModal = new bootstrap.Modal(document.getElementById(strId));
+            // myModal.hide();
+            if(this.btModal){
+                this.btModal.hide();
+            }else{
+                super.hide();
+            }
+        }
+    }
+
+    let gApp = new class{
+        game;
+        mm_handler;
+        constructor() {
+            // init menu
+            this.gUI = GuiManager.getInstance("guiDiv");
+        }
+
+        startGame(){
+            // game should be global.
+            this.game = new Phaser.Game(config);
+            this.gUI.mainMenu("hide");
+            this.gUI.inGameMenu("show");
+        }
+    }();
+
+</script>
+</html>

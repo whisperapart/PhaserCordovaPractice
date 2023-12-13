@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        <meta name="color-scheme" content="light dark">
+        <link rel="stylesheet" href="css/index.css">
+        <link rel="stylesheet" href="css/game.css">
+        <title>Phaser Tilemap</title>
+    </head>
+    <body>
+        <div id="game_div"></div>
+    </body>
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="./js/index.js"></script>
+<script type="text/javascript" src="./js/phaser.miku.min.js"></script>
+<script type="text/javascript">
+    const GLOBALCONFIG = {
+        intUpdateDistance : 500,
+        SpriteDepth : 10
+    };
+
+    // Scene
+    class Example extends Phaser.Scene{
+        ball;
+        intBallPreX;
+        intBallPreY;
+        // map;
+        // layerMap = new Map();
+
+        // used for chunk-loading
+        _tileSetImageArr = ["assets/map/world/wang_tile_v4_ext_2.png",
+            "assets/map/world/cliff_v3_ext_2.png",
+            "assets/map/world/buildings.png",
+            "assets/map/world/buildings_s.png",
+            "assets/map/world/rock.png"
+        ];
+        _tileSetNameArr = ["ground","cliff","buildings","buildings_s","rocks"];
+        displayedChunks = [];
+        maps = {};
+        chunkWidth = 0;
+        chunkHeight = 0;
+        nbChunksHorizontal = 0;
+        nbChunksVertical = 0;
+        lastChunkID = 0;
+        mapWidthTotal = 0;
+        mapHeightTotal = 0;
+        chunkUrl = './assets/map/world/chunks_x_400_3/';
+        chunkColliderArr = [];
+        playerChunkX = 0;
+        playerChunkY = 0;
+
+        init(){
+        }
+        preload(){
+            this._loadSpriteImage();
+            this._loadTileSetImage();
+            // this._loadTileMap();
+            this._loadTileMapByChunks();
+        }
+        create(){
+            // 一张脸原则
+
+            // this._createMap();
+            this._createTiledMapByChunks();
+
+            this._createSprite();
+
+            this.updateEnvironment();
+
+            // 只有一开始update了周边的chunks
+
+            this._createCameras();
+
+        }
+        update(time,delta){
+            // fix - 应该定期根据ball的位置，更新chunks: displayNew(add ) 移除旧的（回收）
+            // tile 40px chunk 50 = 2000px - 先取500
+
+            // 逻辑1： 根据距离
+            if(this._util_get_distance(this.ball.x,this.ball.y,this.intBallPreX,this.intBallPreY) > GLOBALCONFIG.intUpdateDistance){
+                this.updateEnvironment();
+                this.intBallPreX = this.ball.x;
+                this.intBallPreY = this.ball.y;
+            }
+            // 逻辑2 ： 根据ball Sprite 的移动控制 - 本次忽略
+
+        }
+        destroy(){
+
+        }
+
+        _util_get_distance(x1,y1,x2,y2){
+            return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+        }
+
+        _loadSpriteImage(){
+            this.load.image('ball','./assets/sprites/ball.png');
+        }
+        _loadTileSetImage(){
+            // this.load.image('tank_tile_set_image','./assets/map/tank_ts-extrud.png');
+            let that = this;
+            this._tileSetImageArr.forEach(function(value,index){
+                that.load.image("tileImage"+index,value);
+            });
+        }
+        _loadTileMap(){
+            this.load.tilemapTiledJSON('tank','./assets/map/tank-map.json');
+        }
+        _loadTileMapByChunks(){
+            let that = this;
+            this.cache.tilemap.events.on('add',function(cache,key){
+                that._displayChunk(key);
+            });
+            this.load.json('master', this.chunkUrl+'master.json');
+        }
+        _displayChunk(key){
+            let map = this.make.tilemap({ key: key});
+            let tileSetArr = [];
+            for(let i =0;i<this._tileSetNameArr.length;i++){
+                if(i === 0 || i === 1){
+                    tileSetArr.push(map.addTilesetImage(this._tileSetNameArr[i],"tileImage"+i,40,40,2,4));
+                }else{
+                    tileSetArr.push(map.addTilesetImage(this._tileSetNameArr[i],"tileImage"+i));
+                }
+            }
+
+            // We need to compute the position of the chunk in the world
+            let chunkID = parseInt(key.match(/\d+/)[0]); // Extracts the chunk number from file name
+            let chunkX = (chunkID%this.nbChunksHorizontal)*this.chunkWidth;
+            let chunkY = Math.floor(chunkID/this.nbChunksHorizontal)*this.chunkHeight;
+
+            for(let i = 0; i < map.layers.length; i++) {
+                // Load layer from the map using the layer index
+                let layer = map.createLayer(i, tileSetArr, chunkX*40, chunkY*40);
+                layer.setDepth(2*i);
+            }
+        };
+        // Determines the ID of the chunk on which the player charachter is based on its coordinates in the world
+        _computeChunkID(x,y){
+            let tileX = Math.floor(x/40);
+            let tileY = Math.floor(y/40);
+            let chunkX = Math.floor(tileX/this.chunkWidth);
+            let chunkY = Math.floor(tileY/this.chunkHeight);
+            return (chunkY*this.nbChunksHorizontal)+chunkX;
+        };
+        // Returns the entries in secondArray that are not present in firstArray
+        _findDiffArrayElements(firstArray,secondArray){
+            return firstArray.filter(function(i) {return secondArray.indexOf(i) < 0;});
+        };
+        // Returns the list of chunks surrounding a specific chunk, taking the world borders into
+        // account. If you find a smarter way to do it, I'm interested!
+        _listAdjacentChunks(chunkID){
+            let chunks = [];
+            let isAtTop = (chunkID < this.nbChunksHorizontal);
+            let isAtBottom = (chunkID > this.lastChunkID - this.nbChunksHorizontal);
+            let isAtLeft = (chunkID%this.nbChunksHorizontal == 0);
+            let isAtRight = (chunkID%this.nbChunksHorizontal == this.nbChunksHorizontal-1);
+            chunks.push(chunkID);
+            if(!isAtTop) chunks.push(chunkID - this.nbChunksHorizontal);
+            if(!isAtBottom) chunks.push(chunkID + this.nbChunksHorizontal);
+            if(!isAtLeft) chunks.push(chunkID-1);
+            if(!isAtRight) chunks.push(chunkID+1);
+            if(!isAtTop && !isAtLeft) chunks.push(chunkID-1-this.nbChunksHorizontal);
+            if(!isAtTop && !isAtRight) chunks.push(chunkID+1-this.nbChunksHorizontal);
+            if(!isAtBottom && !isAtLeft) chunks.push(chunkID-1+this.nbChunksHorizontal);
+            if(!isAtBottom && !isAtRight) chunks.push(chunkID+1+this.nbChunksHorizontal);
+            return chunks;
+        };
+        _removeChunk(chunkID){
+            for(let i=0;i<this.chunkColliderArr.length;i++){
+                if(this.chunkColliderArr[i] == null) continue;
+                if(this.chunkColliderArr[i].chunkID === chunkID){
+                    this.physics.world.colliders.remove(this.chunkColliderArr[i]);
+                    this.chunkColliderArr[i] = null;
+                }
+            }
+            this.chunkColliderArr = this.chunkColliderArr.filter(Boolean);
+            this.maps[chunkID].destroy();
+            let idx = this.displayedChunks.indexOf(chunkID);
+            if(idx > -1) this.displayedChunks.splice(idx,1);
+        };
+        updateEnvironment(){
+            let chunkID = this._computeChunkID(this.ball.x,this.ball.y);
+            let chunks = this._listAdjacentChunks(chunkID); // List the id's of the chunks surrounding the one we are in
+            let newChunks = this._findDiffArrayElements(chunks,this.displayedChunks); // Lists the surrounding chunks that are not displayed yet (and have to be)
+            let oldChunks = this._findDiffArrayElements(this.displayedChunks,chunks); // Lists the surrounding chunks that are still displayed (and shouldn't anymore)
+            this.playerChunkX = (chunkID%this.nbChunksHorizontal)*this.chunkWidth;
+            this.playerChunkY = Math.floor(chunkID/this.nbChunksHorizontal)*this.chunkHeight;
+
+            let that = this;
+            newChunks.forEach(function (c) {
+                that.load.tilemapTiledJSON("chunk"+c, that.chunkUrl+"chunk"+c+".json");
+            });
+
+            if(newChunks.length > 0) {
+                this.load.start();
+            }
+
+            for(let i=0;i<oldChunks.length;i++) {
+                this._removeChunk(oldChunks[i]);
+            }
+
+            this._updateCollision();
+        };
+        _updateCollision(){
+            this.physics.world.setBounds(0,0,this.mapWidthTotal,this.mapHeightTotal);
+        }
+
+        _createMap(){
+            this.map = this.make.tilemap({key:'tank'});
+            this.tiles = this.map.addTilesetImage("tank_ts","tank_tile_set_image",32,32,2,4);
+            this.layerMap.set('layer-land',this.map.createLayer('land',this.tiles,0,0));
+            this.layerMap.set('layer-decoration',this.map.createLayer('decoration',this.tiles,0,0));
+            this.layerMap.set('layer-screen',this.map.createLayer('screen',this.tiles,0,0));
+        }
+        _createTiledMapByChunks(){
+            this.maps = {};
+            this.displayedChunks = [];
+            let masterData = this.cache.json.get("master");
+            this.chunkWidth = masterData.chunkWidth;
+            this.chunkHeight = masterData.chunkHeight;
+            this.nbChunksHorizontal = masterData.nbChunksHorizontal;
+            this.nbChunksVertical = masterData.nbChunksVertical;
+            this.lastChunkID = (this.nbChunksHorizontal * this.nbChunksVertical) - 1;
+
+            this.mapWidthTotal = masterData.nbChunksHorizontal*masterData.chunkWidth*40;
+            this.mapHeightTotal = masterData.nbChunksVertical*masterData.chunkHeight*40;
+        }
+        _createSprite(){
+            this.ball = this.physics.add.sprite(50,300,'ball');
+            this.ball.setCircle(96);
+            this.ball.setScale(0.5);
+            this.ball.body.setBounce(1,1);
+            this.ball.body.setCollideWorldBounds(true);
+            this.ball.setGravity(100);
+            this.ball.setVelocityX(100);
+            this.ball.setAngularVelocity(100);
+            this.intBallPreX = this.ball.x;
+            this.intBallPreY = this.ball.y;
+            this.ball.setDepth(GLOBALCONFIG.SpriteDepth);
+        }
+        _createCameras(){
+            this.cameras.main.setBounds(0,0,this.mapWidthTotal,this.mapHeightTotal);
+            this.cameras.main.startFollow(this.ball);
+        }
+    }
+
+    // phaser game config
+    let config = {
+        type: Phaser.WEBGL,
+        parent : 'game_div',
+        width: document.body.clientWidth,
+        height: document.body.clientHeight,
+        physics:{
+            default: 'arcade',
+            arcade : {debug:true}
+        },
+        scene: Example  // [scene array]  CLASS not object
+    }
+
+    // start phaser game
+
+</script>
+</html>
