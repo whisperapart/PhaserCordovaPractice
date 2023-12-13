@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>frog</title>
+    <style>
+        #mapArea{
+            height: 1000px;width:1000px;
+            background-size: 1000px 1000px;
+            margin:0;padding:0;
+            background-image:url("./img/world_mini_1000_8bit.png");
+        }
+        #mapMask{
+            height: 1000px;width:1000px;
+            z-index: 1000;
+            background-color: rgba(32,40,48);
+            -webkit-mask-composite: destination-in;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="frog">
+        <div id="mapArea">
+            <div id="mapMask"></div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="./js/jquery.3.4.0.min.js"></script>
+<script type="text/javascript">
+    let arrPoints = [
+        {'x':100,'y':100},{'x':200,'y':100},{'x':300,'y':100},{'x':400,'y':100},{'x':500,'y':100},
+        {'x':100,'y':200},{'x':200,'y':200},{'x':300,'y':300},{'x':400,'y':400},{'x':500,'y':500}
+    ];
+    let width = $("#mapArea").width();
+    let height = $("#mapArea").height();
+
+    /**
+     * draw one circle for frog
+     * @param idx int, index in arrPoints array.
+     */
+    function drawOnePoint(idx){
+        let p = arrPoints[idx];
+        let strMask = $("#mapMask").css('-webkit-mask-image');
+        let strHalo = "radial-gradient(circle at "+p.x+"px "+p.y+"px , transparent 24px, black 60px)";
+        strMask = strMask === "none" ? strHalo : strMask + ',' + strHalo;
+        $("#mapMask").css('-webkit-mask-image',strMask);
+    }
+
+    function initMap(){
+        for(let i=0;i<arrPoints.length;i++){
+            // draw one point
+            drawOnePoint(i);
+        }
+    }
+
+    $(document).ready(function (){
+        initMap();
+    });
+
+</script>
+</html>
