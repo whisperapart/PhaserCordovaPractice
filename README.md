@@ -1,7 +1,7 @@
 # PhaserCordovaPractice
 Practices for Phaser Cordova development of indie game : Wind and Dust.
 ## Lecture
-- [PhaserCordovaPractice](https://space.bilibili.com/3546578904156616/channel/series)
+- [PhaserCordovaPractice](https://space.bilibili.com/3546578904156616/channel/seriesdetail?sid=3807964&ctype=0)
 ## SourceCode
 - [GitHub_PhaserCordovaPractice](https://github.com/whisperapart/PhaserCordovaPractice)
 ## Game
