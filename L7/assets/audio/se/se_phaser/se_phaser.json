@@ -1,0 +1,115 @@
+{
+  "resources": [
+    "se_phaser_output/se_phaser.ogg",
+    "se_phaser_output/se_phaser.m4a",
+    "se_phaser_output/se_phaser.mp3",
+    "se_phaser_output/se_phaser.ac3"
+  ],
+  "spritemap": {
+    "ejection": {
+      "start": 0,
+      "end": 0.5939909297052154,
+      "loop": false
+    },
+    "fist": {
+      "start": 2,
+      "end": 2.339591836734694,
+      "loop": false
+    },
+    "horse": {
+      "start": 4,
+      "end": 5.4628798185941045,
+      "loop": false
+    },
+    "horse_die": {
+      "start": 7,
+      "end": 8.310997732426303,
+      "loop": false
+    },
+    "jump": {
+      "start": 10,
+      "end": 10.835941043083901,
+      "loop": false
+    },
+    "machete": {
+      "start": 12,
+      "end": 13.1940589569161,
+      "loop": false
+    },
+    "mob_bat_attack": {
+      "start": 15,
+      "end": 16.30736961451247,
+      "loop": false
+    },
+    "mob_cat_die": {
+      "start": 18,
+      "end": 18.681337868480725,
+      "loop": false
+    },
+    "mob_claw": {
+      "start": 20,
+      "end": 21.02607709750567,
+      "loop": false
+    },
+    "mob_deer_die": {
+      "start": 23,
+      "end": 23.614399092970523,
+      "loop": false
+    },
+    "mob_die": {
+      "start": 25,
+      "end": 27.113038548752833,
+      "loop": false
+    },
+    "mob_hurt": {
+      "start": 29,
+      "end": 29.710975056689342,
+      "loop": false
+    },
+    "mob_man_attack": {
+      "start": 31,
+      "end": 31.264965986394557,
+      "loop": false
+    },
+    "mob_man_die": {
+      "start": 33,
+      "end": 34.28510204081633,
+      "loop": false
+    },
+    "mob_man_hurt_1": {
+      "start": 36,
+      "end": 36.35265306122449,
+      "loop": false
+    },
+    "mob_man_hurt_2": {
+      "start": 38,
+      "end": 38.49925170068027,
+      "loop": false
+    },
+    "mob_mummy_die": {
+      "start": 40,
+      "end": 40.54167800453515,
+      "loop": false
+    },
+    "mob_rabbit_hurt": {
+      "start": 42,
+      "end": 42.523537414965986,
+      "loop": false
+    },
+    "mob_roar": {
+      "start": 44,
+      "end": 45.1243537414966,
+      "loop": false
+    },
+    "spear": {
+      "start": 47,
+      "end": 47.33700680272109,
+      "loop": false
+    },
+    "sword": {
+      "start": 49,
+      "end": 49.54859410430839,
+      "loop": false
+    }
+  }
+}

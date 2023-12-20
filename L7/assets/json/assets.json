@@ -1,0 +1,10 @@
+{
+    "images":[
+        ["ball","./assets/sprites/ball.png"],
+        ["tank_tile_set_image","./assets/map/tank_ts-extrud.png"]
+    ],
+    "audioSprite":[
+        ["se_phaser","assets/audio/se/se_phaser/se_phaser.json",["assets/audio/se/se_phaser/se_phaser.mp3","assets/audio/se/se_phaser/se_phaser.ac3","assets/audio/se/se_phaser/se_phaser.ogg","assets/audio/se/se_phaser/se_phaser.m4a"]],
+        ["bg_phaser","assets/audio/bg/bg_phaser/bg_phaser.json",["assets/audio/bg/bg_phaser/bg_phaser.mp3","assets/audio/bg/bg_phaser/bg_phaser.ac3","assets/audio/bg/bg_phaser/bg_phaser.ogg","assets/audio/bg/bg_phaser/bg_phaser.m4a"]]
+    ]
+}

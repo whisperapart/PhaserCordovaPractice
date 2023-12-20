@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CoolDown</title>
+    <style>
+        .btnDiv{
+            margin: 10vh 10vw;padding:0;
+            position: relative;
+        }
+        .btnSkillWrap{
+            width:10vmin; height: 12vmin;
+            position: relative;
+        }
+        .divSkillText{
+            background-color: #bcd4d9;
+        }
+        .divSkillText span{
+            text-align: center;
+            display: table-cell;
+            height: 2vmin;width:10vmin;
+            vertical-align: middle;
+        }
+
+        .btnDiv .btn{
+            width:10vmin;height: 10vmin;
+            border-radius: 5vmin;
+        }
+
+        /*    cool down solutions*/
+        .hot-key-cool-down{
+            position:absolute;
+            top:0;left:0;width:10vmin;height:10vmin;
+            overflow:hidden;
+            z-index: 999;
+            border-radius: 5vmin;
+        }
+
+        .cooldown-half{
+            width:50%;
+            height:100%;
+            overflow:hidden;
+            position:relative;
+            float:left;
+        }
+
+        .cooldown-half-rotator{
+            width:200%;
+            height:200%;
+            top:-50%;
+            position:absolute;
+            background-color:rgba(1,1,1,0.5);
+        }
+
+        .cooldown-half-rotator-right{
+            transform-origin:left center;
+            z-index: 9999;
+            left:0;
+        }
+
+        .cooldown-half-rotator-left{
+            right:0;
+            transform-origin:right center;
+        }
+    </style>
+</head>
+<body>
+    <div class="btnDiv">
+        <div class="btnSkillWrap">
+            <button id="btnInputKey0">
+                <div class="hot-key-cool-down">
+                    <div class="cooldown-half">
+                        <div class="cooldown-half-rotator cooldown-half-rotator-left"></div>
+                    </div>
+                    <div class="cooldown-half">
+                        <div class="cooldown-half-rotator cooldown-half-rotator-right"></div>
+                    </div>
+                </div>
+            </button>
+        </div>
+        <div class="btnSkillWrap" id="btn-skill-wrap-1">
+            <button type="button" class="btn btn-success" id="btnInputKey2">
+            </button>
+            <div class="divSkillText">
+                <span>HK2</span>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="./js/jquery.3.4.0.min.js"></script>
+<script type="text/javascript">
+    let timer_left;
+    let timer_right;
+    function setCoolDownBtn0(event){
+        let msTime = event.data.msTime;
+        let msHalf = msTime / 2;
+        $(this).parent().find(".cooldown-half-rotator-right").css("transition","all "+msHalf + "ms linear 0s").css("transform","rotate(180deg)");
+        let that = this;
+        timer = setTimeout(function(){
+            $(that).parent().find(".cooldown-half-rotator-left").css({
+                "transform":"rotate(180deg)",
+                "transition":"transform "+msHalf + "ms",
+                "transition-timing-function":"linear"
+            });
+        }, msHalf);
+    }
+
+    function setCoolDown(event){
+        // add or remove css with js
+        let msTime = event.data.msTime;
+        let msHalf = msTime / 2;
+        let strCD = '<div class="hot-key-cool-down"><div class="cooldown-half"><div class="cooldown-half-rotator cooldown-half-rotator-left"></div></div><div class="cooldown-half"><div class="cooldown-half-rotator cooldown-half-rotator-right"></div></div></div>';
+        // IT IS OK.........
+        // DOM is not re-drawing...
+        // need to FORCE redraw
+        $(this).parent().find(".hot-key-cool-down").remove();
+        clearTimeout(timer_left);
+        clearTimeout(timer_right);
+        $(this).parent().append(strCD).find(".cooldown-half-rotator-right").offset();
+        $(this).parent().find(".cooldown-half-rotator-right").css("transition","all "+msHalf + "ms linear 0s").css("transform","rotate(180deg)");
+        let that = this;
+        timer_left = setTimeout( function(){
+            $(that).parent().find(".cooldown-half-rotator-left").css({
+                "transform":"rotate(180deg)",
+                "transition":"transform "+msHalf+"ms",
+                "transition-timing-function":"linear"
+            });
+            // another timer to remove
+            timer_right = setTimeout(function () {
+                $(that).parent().find(".hot-key-cool-down").remove();
+            }, msHalf);
+
+        },msHalf );
+        // implement other logics, splash or show skill name e.g. ...
+    }
+
+
+    function _bindKeys(){
+        // bind key event for btn0
+        $("#btnInputKey0").on("click",{msTime:2000},setCoolDownBtn0);
+        $("#btnInputKey2").on("click",{msTime:4000},setCoolDown);
+
+    }
+    $(document).ready(function () {
+        _bindKeys();
+    });
+
+</script>
+</html>

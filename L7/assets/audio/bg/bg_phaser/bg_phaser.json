@@ -1,0 +1,45 @@
+{
+  "resources": [
+    "bg_phaser_output/bg_phaser.ogg",
+    "bg_phaser_output/bg_phaser.m4a",
+    "bg_phaser_output/bg_phaser.mp3",
+    "bg_phaser_output/bg_phaser.ac3"
+  ],
+  "spritemap": {
+    "battle_boss_epic": {
+      "start": 0,
+      "end": 123.42859410430839,
+      "loop": true
+    },
+    "battle_encounter": {
+      "start": 125,
+      "end": 169.13798185941044,
+      "loop": true
+    },
+    "battle_encounter_loop": {
+      "start": 171,
+      "end": 217.3447619047619,
+      "loop": true
+    },
+    "battle_in_the_winter": {
+      "start": 219,
+      "end": 270.1739909297052,
+      "loop": true
+    },
+    "battle_mystical": {
+      "start": 272,
+      "end": 375.2359183673469,
+      "loop": true
+    },
+    "battle_rain_long": {
+      "start": 377,
+      "end": 465.6073469387755,
+      "loop": true
+    },
+    "music_death": {
+      "start": 467,
+      "end": 477.7812698412698,
+      "loop": false
+    }
+  }
+}

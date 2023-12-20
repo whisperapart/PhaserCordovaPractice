@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mouse</title>
+    <style>
+        .mouse{
+            width:100px;height: 144px;
+            background-color: #323232;
+            border:solid 1px black;
+            overflow:hidden;
+            margin:0 auto;
+            border-radius: 20% 20% 50% 50% / 60% 60% 40% 40%;
+        }
+        .leftMouse{
+            width: 50px;
+            display: table-cell;
+            border-radius: 150% 0 0 10% / 300% 0 0 10%;
+            border-left: 5px solid transparent;
+            box-shadow: inset 2px 1px 0 #EB6864, inset -1px -1px 0 #EB6864;
+        }
+        .midMouse{
+            width:20px;
+            border:solid 1px #EB6864;
+            height:50px;display: table-cell;
+            background: linear-gradient(
+                    to bottom,
+                    transparent 0%,
+                    transparent 50%,
+                    #EB6864 50%,
+                    #EB6864 100%
+            );
+            background-size: 10px 6px;
+        }
+        .rightMouse{
+            width: 50px;
+            display: table-cell;
+            border-radius: 0 150% 10% 0 / 0 300% 10% 0;
+            border-right: 5px solid transparent;
+            box-shadow: inset 1px 1px 0 #EB6864, inset -2px -1px 0 #EB6864;
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mouse">
+        <div class="leftMouse"></div>
+        <div class="midMouse"></div>
+        <div class="rightMouse"></div>
+    </div>
+</body>
+</html>
